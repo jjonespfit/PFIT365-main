@@ -21,8 +21,7 @@ $params = @{
     }
     Platforms =@{
       IncludePlatforms =@(
-        "windows",
-        "windowsPhone"
+        "windows"
       )
     }
     users = @{
