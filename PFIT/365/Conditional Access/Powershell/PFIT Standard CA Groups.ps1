@@ -32,5 +32,3 @@ ForEach ($Group in $StandardCAGroups){
       Write-Output "$_ Already Exists"
    }
 }
-
-New-MgUser
