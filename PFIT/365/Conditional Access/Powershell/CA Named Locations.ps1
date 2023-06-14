@@ -13,7 +13,7 @@ if ($null -eq $namedLocation) {
         "@odata.type" = "#microsoft.graph.countryNamedLocation" 
         DisplayName = $Location 
         CountriesAndRegions = @("US") 
-        IncludeUnknownCountriesAndRegions" = $false 
+        IncludeUnknownCountriesAndRegions = $false 
     }
     $namedLocation = New-MgIdentityConditionalAccessNamedLocation -BodyParameter $body
     Write-Host "Created named location $Location."
@@ -41,9 +41,3 @@ $params = @{
 }
 
 New-MgIdentityConditionalAccessNamedLocation -BodyParameter $params
-
-
-
-
-
-69.148.5.11/32
