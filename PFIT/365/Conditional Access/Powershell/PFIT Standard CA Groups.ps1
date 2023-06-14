@@ -1,10 +1,13 @@
 $StandardCAGroups= @(
+         "SG365_Exclude_CA002: Default Block - Travel Users Exclusion"
          "SG365_Exclude_CA004: Require multi-factor authentication for allusers_Restricted",
          "SG365_Exclude_CA009.5: Require Intune - Windows Devices_Restricted",
          "SG365_Exclude_CA009.6: Require Intune MacOS_Testing-Only",
          "SG365_Exclude_CA009.7: Require Intune IOS-Android_Testing-Only",
          "SG365_Exclude_CA009.8: Require Intune Linux_Testing-Only",
          "SG365_Exclude_CA009: Require compliant or hybrid Azure AD joined device for admins_Restricted"
+         "SG365_Exclude_CA00JJ01: Block MFA Enrollment off prem"
+         "SG365_Exclude_CA00JJ03: Default Block - Travel Users Exclusion"
 )
 
 $RequiredScopes = @("DeviceManagementApps.ReadWrite.All", "User.ReadWrite.All","Application.ReadWrite.All", "Group.ReadWrite.All", "Policy.ReadWrite.ConditionalAccess", "DeviceManagementConfiguration.ReadWrite.All", "DeviceManagementServiceConfig.ReadWrite.All","Directory.Read.All","Directory.ReadWrite.All","RoleManagement.Read.Directory","RoleManagement.ReadWrite.Directory", "UserAuthenticationMethod.ReadWrite.All")
@@ -28,7 +31,8 @@ ForEach ($Group in $StandardCAGroups){
          SecurityEnabled = $true
       }
       New-MgGroup -BodyParameter $params
+      Write-Output "$_ was created"
    }else{
-      Write-Output "$_ Already Exists"
+      Write-Output "Skipped $_ Already Exists"
    }
 }
