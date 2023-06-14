@@ -5,11 +5,12 @@ Enable-AIPService
 
 Import-Module ExchangeOnline
 Connect-ExchangeOnline
+Enable-OrganizationCustomization
 $licenseUrl = (Get-AadrmConfiguration).LicensingIntranetDistributionPointUrl
     
 Set-IRMConfiguration -LicensingLocation @{add=$licenseUrl} -InternalLicensingEnabled $true -AutomaticServiceUpdateEnabled $true -EnablePdfEncryption $true -SimplifiedClientAccessEnabled $true -DecryptAttachmentForEncryptOnly $true -AzureRMSLicensingEnabled $true
     
-Enable-OrganizationCustomization
+
 
         $LBL = "RU","ZH-CN","ZH-TW","JA","KO","HE","LV","AR","FR","Vi","PT"
         $RBL = "AX","BY","BR","BI","CF","CN","CG","CD","CI","HR","CU","CZ","DJ","DM","DO","EC","EG","SV","GQ","ER","EE","ET","FK","FO","FJ","GF","PF","TF","GA","GM","GE","GH","GL","GD","GP","GU","GT","GG","GN","GW","GY","HT","HM","HN","HK","HU","IN","ID","IR","IQ","IM","IL","JM","SJ","XJ","JP","JE","JO","KZ","KE","KI","KR","KW","KG","LA","LV","LB","LS","LR","LY","LI","LT","MO","MG","MW","MY","MV","ML","MT","MH","MQ","MR","MU","YT","FM","MD","MC","MN","ME","MS","MA","MZ","MM","NA","NR","NP","NC","NZ","NI","NE","NG","NU","NF","KP","MK","MP","OM","PK","PW","PS","PA","PG","PY","PE","PH","PN","PL","PT","PR","QA","RE","RO","RU","RW","XS","BL","KN","LC","MF","PM","VC","WS","SM","ST","SA","SN","RS","SC","SL","SG","XE","SX","SK","SI","SB","SO","ZA","GS","ES","LK","SH","SD","SR","SZ","SY","TW","TJ","TZ","TH","TL","TG","TK","TO","TT","TN","TR","TM","TC","TV","UM","VI","UG","UA","AE","UY","UZ","VU","VE","VN","WF","YE","ZM","ZW"
@@ -22,7 +23,7 @@ Enable-OrganizationCustomization
     Set-HostedContentFilterPolicy -Identity "Default" -IncreaseScoreWithImageLinks On -IncreaseScoreWithNumericIps On -IncreaseScoreWithRedirectToOtherPort On -IncreaseScoreWithBizOrInfoUrls On -MarkAsSpamEmptyMessages On -MarkAsSpamSensitiveWordList On -MarkAsSpamSpfRecordHardFail On -MarkAsSpamFromAddressAuthFail On -MarkAsSpamBulkMail On -MarkAsSpamNdrBackscatter On -HighConfidenceSpamAction Quarantine -SpamAction MoveToJmf -DownloadLink $false -BulkThreshold 5 -InlineSafetyTips $true -BulkSpamAction Quarantine -PhishSpamAction MoveToJmf -SpamZapEnabled $true -PhishZapEnabled $true -HighConfidencePhishAction Quarantine -EnableRegionBlockList $true -EnableLanguageBlockList $true -RegionBlockList $RBL -LanguageBlockList $LBL
     
     ## Set Malware Filter Policy to standards
-    Set-MalwareFilterPolicy -Identity "Default" -InternalSenderAdminAddress cwp1@caltech.com -EnableInternalSenderAdminNotifications $true -EnableFileFilter $true -ZapEnabled $true
+    Set-MalwareFilterPolicy -Identity "Default" -InternalSenderAdminAddress jordan.jones@pathforwardit.com -EnableInternalSenderAdminNotifications $true -EnableFileFilter $true -ZapEnabled $true
     
     ## Set Hosted Outbound Spam Filter Policy to standards
     Set-HostedOutboundSpamFilterPolicy -Identity "Default" -AutoForwardingMode On
@@ -63,6 +64,17 @@ Connect-IPPSSession
         'AccessScope' = 'NotInOrganization';
         'Disabled' = $true;
     }
+
+    $PIICCSI = @(@{Name="U.S. Individual Taxpayer Identification Number (ITIN)"; maxcount="-1"; confidencelevel="High"; mincount="1"},@{Name="U.S. social security number (SSN)"; maxcount="-1"; confidencelevel="High"; mincount="1"},@{Name="U.S./U.K. passport number"; maxcount="-1"; confidencelevel="High"; mincount="1"})
+    $PIIRuleValue = @{
+        'Name' = 'U.S. PII';
+        'EncryptRMSTemplate' = 'Encrypt';
+        'Policy' = 'PFIT Standard Encryption Policy';
+        'ReportSeverityLevel' = 'Low';
+        'ContentContainsSensitiveInformation' = $PIICCSI;
+        'AccessScope' = 'NotInOrganization';
+        'Disabled' = $true;
+    }
     New-Label -Name "Manual Encryption" -DisplayName "Manual Encryption" -Tooltip "Use this label to manually encrypt email" `
     -EncryptionContentExpiredOnDateInDaysOrNever "Never" -EncryptionOfflineAccessDays "-1" -ContentType "File, Email" -EncryptionDoNotForward $false `
     -EncryptionEnabled $true -EncryptionEncryptOnly $true `
@@ -85,6 +97,12 @@ Connect-IPPSSession
     new-dlpcompliancerule @ManualRuleValue
 
     new-dlpcompliancerule $HIPAARuleValue
+
+    New-DlpComplianceRule $PIIRuleValue
+
+    New-RetentionCompliancePolicy -Name "Standard 7 Years Retention Policy" -ExchangeLocation "All"
+    new-retentioncomplianceRule -Name "Regulation 123 ComplianceRule" -Policy "Standard 7 Years Retention Policy" -RetentionDuration 2555 -RetentionDurationDisplayHint Years -RetentionComplianceAction "Keep"
+    
 
 Disconnect-ExchangeOnline
 

@@ -16,6 +16,9 @@ $params = @{
       IncludeUsers = @(
         "All"
        )
+       ExcludeUsers =@(
+        $ExcludeCAGroups.ID
+       )
     }
     Locations = @{
       IncludeLocations = @(

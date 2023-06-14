@@ -1,4 +1,4 @@
-$ExcludeCAGroups = Get-MgGroup -top 999 -Filter "startswith(DisplayName,'SG365_Exclude_CA009: Require compliant or hybrid Azure AD joined device for admins_Restricted')" | Select-Object ID
+$ExcludeCAGroups = Get-MgGroup -top 999 -Filter "startswith(DisplayName,'SG365_Exclude_CA009.7: Require Intune IOS-Android_Testing-Only')" | Select-Object ID
 
 $params = @{
   DisplayName = "CA009.7: Require Intune IOS-Android"
@@ -41,7 +41,7 @@ $params = @{
    GrantControls = @{
      Operator = "OR"
      BuiltInControls = @(
-       "compliantDevice"
+      "compliantDevice"
      )
    }
 }
