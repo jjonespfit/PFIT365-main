@@ -5,7 +5,7 @@ if (-not (Get-Module -Name MicrosoftTeams -ListAvailable)) {
     
     # Import Microsoft Graph module
     Import-Module -Name MicrosoftTeams 
-
+}
 # Turn off Guest Access by Default - Allow as needed
 Set-CsTeamsClientConfiguration -Identity Global -AllowGuestUser $false 
 

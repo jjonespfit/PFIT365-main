@@ -1,4 +1,4 @@
-$ExcludeCAGroups = Get-MgGroup -top 999 -Filter "startswith(DisplayName,'SG365_Exclude_CA009: Require compliant or hybrid Azure AD joined device for admins_Restricted')" | Select-Object ID
+$ExcludeCAGroups = Get-MgGroup -top 999 -Filter "startswith(DisplayName,'SG365_Exclude_CA009.6: Require Intune MacOS_Testing-Only')" | Select-Object ID
 
 $params = @{
   DisplayName = "CA009.6 Require Intune MacOS"
