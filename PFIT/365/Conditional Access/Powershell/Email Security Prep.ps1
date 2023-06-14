@@ -1,4 +1,14 @@
+Install-Module AIPservice
+connect-aipservice
+Enable-AIPService
+
+
+Import-Module ExchangeOnline
 Connect-ExchangeOnline
+$licenseUrl = (Get-AadrmConfiguration).LicensingIntranetDistributionPointUrl
+    
+Set-IRMConfiguration -LicensingLocation @{add=$licenseUrl} -InternalLicensingEnabled $true -AutomaticServiceUpdateEnabled $true -EnablePdfEncryption $true -SimplifiedClientAccessEnabled $true -DecryptAttachmentForEncryptOnly $true -AzureRMSLicensingEnabled $true
+    
 Enable-OrganizationCustomization
 
         $LBL = "RU","ZH-CN","ZH-TW","JA","KO","HE","LV","AR","FR","Vi","PT"
@@ -35,9 +45,6 @@ Enable-OrganizationCustomization
     ##Anti-Phish Policy
     Set-AntiPhishPolicy -Identity "Office365 AntiPhish Default" -PhishThresholdLevel 3 -EnableMailboxIntelligenceProtection $true -EnableOrganizationDomainsProtection $true -EnableMailboxIntelligence $true -EnableSimilarDomainsSafetyTips $true -EnableFirstContactSafetyTips $true -EnableUnusualCharactersSafetyTips $true -EnableSpoofIntelligence $true -EnableViaTag $true -EnableUnauthenticatedSender $true -MailboxIntelligenceProtectionAction MovetoJmf -TargetedDomainProtectionAction MovetoJmf -AuthenticationFailAction MovetoJmf
     
-
-Disconnect-ExchangeOnline
-
 Connect-IPPSSession
 
     $CCSI = @(@{Name="International Classification of Diseases (ICD-9-CM)"; maxcount="-1"; confidencelevel="High"; mincount="1"},@{Name="International Classification of Diseases (ICD-10-CM)"; maxcount="-1"; confidencelevel="High"; mincount="1"},@{Name="All Medical Terms And Conditions"; maxcount="-1"; confidencelevel="High"; mincount="1"},@{Name="U.S. Physical Addresses"; maxcount="-1"; confidencelevel="Medium"; mincount="1"})
@@ -67,7 +74,7 @@ Connect-IPPSSession
     $ManualRuleValue = @{
         'Name' = 'Manually Encrypted';
         'EncryptRMSTemplate' = 'Encrypt';
-        'Policy' = 'Encryption Policy';
+        'Policy' = 'PFIT Standard Encryption Policy';
         'ReportSeverityLevel' = 'Low';
         'ContentContainsSensitiveInformation' = $ManualCCSI;
         'AccessScope' = 'NotInOrganization';
@@ -79,4 +86,9 @@ Connect-IPPSSession
 
     new-dlpcompliancerule $HIPAARuleValue
 
-Disconnect-IPPSSession 
+Disconnect-ExchangeOnline
+
+
+PII Enhanced for Teams 
+
+Discuss Prompt in Teams as needed

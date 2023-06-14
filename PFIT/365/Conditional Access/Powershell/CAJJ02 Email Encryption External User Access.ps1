@@ -1,6 +1,6 @@
 
 $params = @{
-  DisplayName = "CA002: Email Encryption External User Access"
+  DisplayName = "CAJJ002: Email Encryption External User Access"
   State = "disabled"
   Conditions = @{
     ClientAppTypes = @(

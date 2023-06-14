@@ -1,6 +1,7 @@
+$ExcludeCAGroups = Get-MgGroup -top 999 -Filter "startswith(DisplayName,'SG365_Exclude_CA00JJ01: Block MFA Enrollment off prem')" | Select-Object ID
 
 $params = @{
-  DisplayName = "CA002: Block MFA Reistratoin off Prem"
+  DisplayName = "CAJJ001: Block MFA Reistratoin off Prem"
   State = "disabled"
   Conditions = @{
     ClientAppTypes = @(
