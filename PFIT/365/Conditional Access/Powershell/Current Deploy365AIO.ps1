@@ -24,7 +24,7 @@ $($notInstalled -join "`n")
 Import-Module $modules
 
 
-$RequiredScopes = @("DeviceManagementApps.ReadWrite.All", "User.ReadWrite.All","Application.ReadWrite.All", "Group.ReadWrite.All", "Policy.ReadWrite.ConditionalAccess", "DeviceManagementConfiguration.ReadWrite.All", "DeviceManagementServiceConfig.ReadWrite.All","Directory.Read.All","Directory.ReadWrite.All","RoleManagement.Read.Directory","RoleManagement.ReadWrite.Directory", "UserAuthenticationMethod.ReadWrite.All","Policy.ReadWrite.Authorization","EntitlementManagement.ReadWrite.All","Policy.ReadWrite.AuthenticationFlows")
+$RequiredScopes = @("DeviceManagementApps.ReadWrite.All", "User.ReadWrite.All","Application.ReadWrite.All", "Group.ReadWrite.All", "Policy.ReadWrite.ConditionalAccess", "DeviceManagementConfiguration.ReadWrite.All", "DeviceManagementServiceConfig.ReadWrite.All","Directory.Read.All","Directory.ReadWrite.All","RoleManagement.Read.Directory","RoleManagement.ReadWrite.Directory", "UserAuthenticationMethod.ReadWrite.All","Policy.ReadWrite.Authorization","EntitlementManagement.ReadWrite.All","Policy.ReadWrite.AuthenticationFlows","Policy.Read.All")
 
 Connect-MgGraph -Scopes $RequiredScopes
 $IntuneServicePrincipal = "d4ebce55-015a-49b5-a083-c84d1797ae8c"
@@ -54,7 +54,7 @@ ForEach ($Group in $StandardCAGroups){
    #$GroupCheck = get-mggroup -Property Displayname | Where-Object DisplayName eq $($Group) 
   
    #if not exists then create it
-    If(!$GroupCheck){
+  If(!$GroupCheck){
       $params = @{
          Description = "standard CA exclusion group"
          DisplayName = "$Group"
@@ -108,6 +108,7 @@ forEach ($ID in $Z1){
      }
  else{
     Write-host "$User Already Exists"
+    $Z1 = (get-mguser | Where-Object -Property UserPrincipalName -CMatch zEmergencyAdmin).id 
  }
 }
 
@@ -185,7 +186,15 @@ if ($null -eq $Checkpolicy) {
           "158c047a-c907-4556-b7ef-446551a6b5f7",
           "966707d0-3269-4727-9be2-8c3a10f19b9d",
           "7be44c8a-adaf-4e2a-84d6-ab2649e08a13",
-          "e8611ab8-c189-46e8-94e1-60213ab1f814"
+          "e8611ab8-c189-46e8-94e1-60213ab1f814",
+          "fdd7a751-b60b-444a-984c-02652fe8fa1c",
+          "a9ea8996-122f-4c74-9520-8edcd192826c",
+          "44367163-eba1-44c3-98af-f5787879f96a",
+          "7698a772-787b-4ac8-901f-60d6b08affd2",
+          "f2ef992c-3afb-46b9-b7cf-a126ee74c451",
+          "2b745bdf-0803-4d80-aa65-822c4493daac",
+          "11648597-926c-4cf3-9c36-bcebb0ba8dcc",
+          "5f2222b1-57c3-48ba-8ad5-d4759f1fde6f"
          )
       }
       Locations = @{
@@ -197,12 +206,18 @@ if ($null -eq $Checkpolicy) {
         )
       }
      }
-     GrantControls = @{
-       Operator = "OR"
-       BuiltInControls = @(
-         "mfa"
-       )
-     }
+     grantControls = @{
+      operator = "OR"
+      builtInControls = @(
+      )
+      customAuthenticationFactors = @(
+      )
+      termsOfUse = @(
+      )
+      authenticationStrength = @{
+        id = "00000000-0000-0000-0000-000000000002"
+      }
+    }
   }
   
   New-MgIdentityConditionalAccessPolicy -BodyParameter $params | Out-Null
@@ -350,12 +365,18 @@ if ($null -eq $Checkpolicy) {
         )
       }
      }
-     GrantControls = @{
-       Operator = "OR"
-       BuiltInControls = @(
-         "mfa"
-       )
-     }
+     grantControls = @{
+      operator = "OR"
+      builtInControls = @(
+      )
+      customAuthenticationFactors = @(
+      )
+      termsOfUse = @(
+      )
+      authenticationStrength = @{
+        id = "00000000-0000-0000-0000-000000000002"
+      }
+    }
   }
   New-MgIdentityConditionalAccessPolicy -BodyParameter $params | Out-Null
             Write-Host "Created policy $PolicyName."
@@ -392,11 +413,17 @@ if ($null -eq $Checkpolicy) {
       }
      }
      GrantControls = @{
-       Operator = "OR"
-       BuiltInControls = @(
-         "mfa"
-       )
-     }
+      operator = "OR"
+      builtInControls = @(
+      )
+      customAuthenticationFactors = @(
+      )
+      termsOfUse = @(
+      )
+      authenticationStrength = @{
+        id = "00000000-0000-0000-0000-000000000002"
+      }
+    }
   }
   New-MgIdentityConditionalAccessPolicy -BodyParameter $params | Out-Null
             Write-Host "Created policy $PolicyName."
@@ -436,11 +463,17 @@ if ($null -eq $Checkpolicy) {
       }
      }
      GrantControls = @{
-       Operator = "OR"
-       BuiltInControls = @(
-         "mfa"
-       )
-     }
+      operator = "OR"
+      builtInControls = @(
+      )
+      customAuthenticationFactors = @(
+      )
+      termsOfUse = @(
+      )
+      authenticationStrength = @{
+        id = "00000000-0000-0000-0000-000000000002"
+      }
+    }
   }
   New-MgIdentityConditionalAccessPolicy -BodyParameter $params | Out-Null
             Write-Host "Created policy $PolicyName."
@@ -493,7 +526,13 @@ if ($null -eq $Checkpolicy) {
           "7be44c8a-adaf-4e2a-84d6-ab2649e08a13",
           "e8611ab8-c189-46e8-94e1-60213ab1f814",
           "fdd7a751-b60b-444a-984c-02652fe8fa1c",
-          "a9ea8996-122f-4c74-9520-8edcd192826c"
+          "a9ea8996-122f-4c74-9520-8edcd192826c",
+          "44367163-eba1-44c3-98af-f5787879f96a",
+          "7698a772-787b-4ac8-901f-60d6b08affd2",
+          "f2ef992c-3afb-46b9-b7cf-a126ee74c451",
+          "2b745bdf-0803-4d80-aa65-822c4493daac",
+          "11648597-926c-4cf3-9c36-bcebb0ba8dcc",
+          "5f2222b1-57c3-48ba-8ad5-d4759f1fde6f"
         )
         ExcludeGroups = @(
           $ExcludeCAGroups.Id
