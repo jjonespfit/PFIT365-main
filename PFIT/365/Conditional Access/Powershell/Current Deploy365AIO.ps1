@@ -38,15 +38,23 @@ if ($null -eq $ServiceIDCheck) {
         }
 
 $StandardCAGroups= @(
-    "SG365_Exclude_CA002: Default Block - Travel Users Exclusion"
+    "SG365_Exclude_CA001: Require multi-factor authentication for admins",
+    "SG365_Exclude_CA002: Default Block - Travel Users Exclusion",
+    "SG365_Exclude_CA003: Block legacy authentication",
     "SG365_Exclude_CA004: Require multi-factor authentication for allusers_Restricted",
-    "SG365_Exclude_CA009.5: Require Intune - Windows Devices_Restricted",
-    "SG365_Exclude_CA009.6: Require Intune MacOS_Testing-Only",
-    "SG365_Exclude_CA009.7: Require Intune IOS-Android_Testing-Only",
-    "SG365_Exclude_CA009.8: Require Intune Linux_Testing-Only",
-    "SG365_Exclude_CA009: Require compliant or hybrid Azure AD joined device for admins_Restricted"
-    "SG365_Exclude_CA00JJ01: Block MFA Enrollment off prem"
-    "SG365_Exclude_CA00JJ03: Default Block - Travel Users Exclusion"
+    "SG365_Exclude_CA005: Require multi-factor authentication for guest access",
+    "SG365_Exclude_CA006: Require multi-factor authentication for Azure management",
+    "SG365_Exclude_CA009: Require compliant or hybrid Azure AD joined device for admins_Restricted",
+    "SG365_Exclude_CA009.5: Require Compliance Device - Windows Devices_Restricted",
+    "SG365_Exclude_CA009.6: Require Compliance Device - MacOS_Testing-Only",
+    "SG365_Exclude_CA009.7: Require Compliance Device - IOS-Android_Testing-Only",
+    "SG365_Exclude_CA009.8: Require Compliance Device - Linux_Testing-Only",
+    "SG365_Exclude_CA010: Block access for unknown or unsupported device platform",
+    "SG365_Exclude_CA011: Require Intune Mobile Device App Protection Policy",
+    "SG365_Exclude_CA012: Block MFA Enrollment from Non Trusted Locations",
+    "SG365_Exclude_CA013: Email Encryption External User Access",
+    "SG365_Exclude_CA014: Default Block - Travel Policy"
+    
 )
 ForEach ($Group in $StandardCAGroups){
    # check if group exists
@@ -157,6 +165,7 @@ if ($null -eq $namedLocation) {
 ###################   Admin MFA Policy ############
 $PolicyName = "CA001: Require multi-factor authentication for admins"
 $Checkpolicy = Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$PolicyName'"
+$ExcludeCAGroups = Get-MgGroup -top 999 -Filter "startswith(DisplayName,'SG365_Exclude_CA001: Require multi-factor authentication for admins')" | Select-Object ID
 if ($null -eq $Checkpolicy) {
   $params = @{
     DisplayName = "$policyName"
@@ -196,6 +205,9 @@ if ($null -eq $Checkpolicy) {
           "11648597-926c-4cf3-9c36-bcebb0ba8dcc",
           "5f2222b1-57c3-48ba-8ad5-d4759f1fde6f"
          )
+         ExcludeGroups = @(
+          $ExcludeCAGroups.Id
+         )
       }
       Locations = @{
         IncludeLocations = @(
@@ -228,7 +240,7 @@ if ($null -eq $Checkpolicy) {
 
 
 ###################   Default Block Policy ########
-$PolicyName = "CA002: Default Block"
+$PolicyName = "CA002: Default Block - Travel Users Exclusion"
 $Checkpolicy = Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$PolicyName'"
 $ExcludeCAGroups = Get-MgGroup -top 999 -Filter "startswith(DisplayName,'SG365_Exclude_CA002: Default Block - Travel Users Exclusion')" | Select-Object ID
 $AllowedCountriesNamedLocation = Get-MgIdentityConditionalAccessNamedLocation -Filter "startswith(DisplayName,'Allowed Countries')" | Select-Object ID
@@ -283,6 +295,7 @@ if ($null -eq $Checkpolicy) {
 ################### Block Legacy Auth Policy ######
 $PolicyName = "CA003: Block legacy authentication"
 $Checkpolicy = Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$PolicyName'"
+$ExcludeCAGroups = Get-MgGroup -top 999 -Filter "startswith(DisplayName,'SG365_Exclude_CA003: Block legacy authentication')" | Select-Object ID
 if ($null -eq $Checkpolicy) {
   $params = @{
     DisplayName = $PolicyName
@@ -300,6 +313,9 @@ if ($null -eq $Checkpolicy) {
       users = @{
         IncludeUsers = @(
           "All"
+         )
+        ExcludeGroups = @(
+          $ExcludeCAGroups.Id
          )
       }
       Locations = @{
@@ -387,6 +403,7 @@ if ($null -eq $Checkpolicy) {
 ################### MFA for Guest Users Policy ######
 $PolicyName = "CA005: Require multi-factor authentication for guest access"
 $Checkpolicy = Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$PolicyName'"
+$ExcludeCAGroups = Get-MgGroup -top 999 -Filter "startswith(DisplayName,'SG365_Exclude_CA005: Require multi-factor authentication for guest access')" | Select-Object ID
 if ($null -eq $Checkpolicy) {
   $params = @{
     DisplayName = $PolicyName
@@ -404,6 +421,9 @@ if ($null -eq $Checkpolicy) {
       users = @{
         IncludeUsers = @(
           "GuestsOrExternalUsers"
+         )
+         ExcludeGroups = @(
+          $ExcludeCAGroups.Id
          )
       }
       Locations = @{
@@ -432,8 +452,9 @@ if ($null -eq $Checkpolicy) {
         }
 
 ################### MFA for Azure Management Policy ############
-$PolicyName = "CA006: Require multi-factor authentication for Azure managemen"
+$PolicyName = "CA006: Require multi-factor authentication for Azure management"
 $Checkpolicy = Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$PolicyName'"
+$ExcludeCAGroups = Get-MgGroup -top 999 -Filter "startswith(DisplayName,'SG365_Exclude_CA006: Require multi-factor authentication for Azure management')" | Select-Object ID
 if ($null -eq $Checkpolicy) {
   $params = @{
     DisplayName = $PolicyName
@@ -454,6 +475,9 @@ if ($null -eq $Checkpolicy) {
          )
          ExcludeUsers =@(
           $Z1
+         )
+         ExcludeGroups = @(
+          $ExcludeCAGroups.Id
          )
       }
       Locations = @{
@@ -559,10 +583,10 @@ if ($null -eq $Checkpolicy) {
             Write-Host "Skipped policy $PolicyName because it already exists."
         }
 
-################### Require Compliant Device Windwos ###########
-$PolicyName = "CA009.5: Require Intune - Windows Devices"
+################### Require Compliant Device Windows ###########
+$PolicyName = "CA009.5: Require Compliant Device - Windows Devices"
 $Checkpolicy = Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$PolicyName'"
-$ExcludeCAGroups = Get-MgGroup -top 999 -Filter "startswith(DisplayName,'SG365_Exclude_CA009.5: Require Intune - Windows Devices_Restricted')" | Select-Object ID
+$ExcludeCAGroups = Get-MgGroup -top 999 -Filter "startswith(DisplayName,'SG365_Exclude_CA009.5: Require Compliance Device - Windows Devices_Restricted')" | Select-Object ID
 if ($null -eq $Checkpolicy) {
   $params = @{
     DisplayName = $PolicyName
@@ -617,10 +641,61 @@ if ($null -eq $Checkpolicy) {
             Write-Host "Skipped policy $PolicyName because it already exists."
         }
 
-################### Require Compliant Device MacOS   ###########
-$PolicyName = "CA009.6 Require Intune MacOS"
+################### Require Compliant Device Windows Report Only ###########
+$PolicyName = "CA009.5: Require Compliant Device - Windows Devices Report Only"
 $Checkpolicy = Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$PolicyName'"
-$ExcludeCAGroups = Get-MgGroup -top 999 -Filter "startswith(DisplayName,'SG365_Exclude_CA009.6: Require Intune MacOS_Testing-Only')" | Select-Object ID
+if ($null -eq $Checkpolicy) {
+  $params = @{
+    DisplayName = $PolicyName
+    State = "enabledForReportingButNotEnforced"
+    Conditions = @{
+      ClientAppTypes = @(
+        "browser", 
+        "mobileAppsAndDesktopClients"
+      )
+      Applications = @{
+        IncludeApplications = @(
+          "All"
+        )
+        ExcludeApplications =@(
+          "0000000a-0000-0000-c000-000000000000",
+          "d4ebce55-015a-49b5-a083-c84d1797ae8c",
+          "45a330b1-b1ec-4cc1-9161-9f03992aa49f"
+        )
+      }
+      Platforms =@{
+        IncludePlatforms =@(
+          "windows"
+        )
+      }
+      users = @{
+        IncludeUsers = @(
+          "All"
+         )
+      }
+      Locations = @{
+        IncludeLocations = @(
+          "All"
+        )
+      }
+     }
+     GrantControls = @{
+       Operator = "OR"
+       BuiltInControls = @(
+         "compliantDevice"
+       )
+     }
+  }
+  New-MgIdentityConditionalAccessPolicy -BodyParameter $params | Out-Null
+            Write-Host "Created policy $PolicyName."
+        } else {
+            Write-Host "Skipped policy $PolicyName because it already exists."
+        }
+
+################### Require Compliant Device MacOS   ###########
+$PolicyName = "CA009.6: Require Compliant Device - MacOS"
+$Checkpolicy = Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$PolicyName'"
+$ExcludeCAGroups = Get-MgGroup -top 999 -Filter "startswith(DisplayName,'SG365_Exclude_CA009.6: Require Compliant Device - MacOS_Testing-Only')" | Select-Object ID
 if ($null -eq $Checkpolicy) {
   $params = @{
     DisplayName = $PolicyName
@@ -675,10 +750,61 @@ if ($null -eq $Checkpolicy) {
             Write-Host "Skipped policy $PolicyName because it already exists."
         }
 
-################### Require Compliant Device Policy IOS/ Andriod #############
-$PolicyName = "CA009.7: Require Intune IOS-Android"
+################### Require Compliant Device MacOS Report Only  ###########
+$PolicyName = "CA009.6: Require Compliant Device - MacOS Report Only"
 $Checkpolicy = Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$PolicyName'"
-$ExcludeCAGroups = Get-MgGroup -top 999 -Filter "startswith(DisplayName,'SG365_Exclude_CA009.7: Require Intune IOS-Android_Testing-Only')" | Select-Object ID
+if ($null -eq $Checkpolicy) {
+  $params = @{
+    DisplayName = $PolicyName
+    State = "enabledForReportingButNotEnforced"
+    Conditions = @{
+      ClientAppTypes = @(
+        "browser", 
+        "mobileAppsAndDesktopClients"
+      )
+      Applications = @{
+        IncludeApplications = @(
+          "All"
+        )
+        ExcludeApplications =@(
+          "0000000a-0000-0000-c000-000000000000",
+          "d4ebce55-015a-49b5-a083-c84d1797ae8c",
+          "45a330b1-b1ec-4cc1-9161-9f03992aa49f"
+        )
+      }
+      Platforms =@{
+        IncludePlatforms =@(
+          "macOS"
+        )
+      }
+      users = @{
+        IncludeUsers = @(
+          "All"
+         )
+      }
+      Locations = @{
+        IncludeLocations = @(
+          "All"
+        )
+      }
+     }
+     GrantControls = @{
+       Operator = "OR"
+       BuiltInControls = @(
+         "compliantDevice"
+       )
+     }
+  }
+  New-MgIdentityConditionalAccessPolicy -BodyParameter $params | Out-Null
+            Write-Host "Created policy $PolicyName."
+        } else {
+            Write-Host "Skipped policy $PolicyName because it already exists."
+        }
+
+################### Require Compliant Device Policy IOS/ Andriod #############
+$PolicyName = "CA009.7: Require Compliant Device IOS-Android"
+$Checkpolicy = Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$PolicyName'"
+$ExcludeCAGroups = Get-MgGroup -top 999 -Filter "startswith(DisplayName,'SG365_Exclude_CA009.7: Require Compliance Device - IOS-Android_Testing-Only')" | Select-Object ID
 if ($null -eq $Checkpolicy) {
   $params = @{
     DisplayName = $PolicyName
@@ -734,9 +860,122 @@ if ($null -eq $Checkpolicy) {
             Write-Host "Skipped policy $PolicyName because it already exists."
         }
 
-################### Require App Protection Policy IOS/Andriod ################
-$PolicyName = "CA009.7.2: Require Intune Mobile Device App Protection Policy"
+################### Require Compliant Device Policy IOS/ Andriod Report Only #############
+$PolicyName = "CA009.7: Require Compliant Device IOS-Android Report Only"
 $Checkpolicy = Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$PolicyName'"
+if ($null -eq $Checkpolicy) {
+  $params = @{
+    DisplayName = $PolicyName
+    State = "enabledForReportingButNotEnforced"
+    Conditions = @{
+      ClientAppTypes = @(
+        "browser", 
+        "mobileAppsAndDesktopClients"
+      )
+      Applications = @{
+        IncludeApplications = @(
+          "All"
+        )
+        ExcludeApplications =@(
+          "0000000a-0000-0000-c000-000000000000",
+          "d4ebce55-015a-49b5-a083-c84d1797ae8c",
+          "45a330b1-b1ec-4cc1-9161-9f03992aa49f"
+        )
+      }
+      Platforms =@{
+        IncludePlatforms =@(
+          "android",
+          "iOS"
+        )
+      }
+      users = @{
+        IncludeUsers = @(
+          "All"
+         )
+      }
+      Locations = @{
+        IncludeLocations = @(
+          "All"
+        )
+      }
+     }
+     GrantControls = @{
+       Operator = "OR"
+       BuiltInControls = @(
+        "compliantDevice"
+       )
+     }
+  }
+  New-MgIdentityConditionalAccessPolicy -BodyParameter $params | Out-Null
+            Write-Host "Created policy $PolicyName."
+        } else {
+            Write-Host "Skipped policy $PolicyName because it already exists."
+        }
+
+
+################### Require Compliant Device Linuc  ###########
+$PolicyName = "CA009.8: Require Compliant Device - Linux"
+$Checkpolicy = Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$PolicyName'"
+$ExcludeCAGroups = Get-MgGroup -top 999 -Filter "startswith(DisplayName,'SG365_Exclude_CA009.8: Require Compliance Device - Linux_Testing-Only')" | Select-Object ID
+if ($null -eq $Checkpolicy) {
+  $params = @{
+    DisplayName = $PolicyName
+    State = "disabled"
+    Conditions = @{
+      ClientAppTypes = @(
+        "browser", 
+        "mobileAppsAndDesktopClients"
+      )
+      Applications = @{
+        IncludeApplications = @(
+          "All"
+        )
+        ExcludeApplications =@(
+          "0000000a-0000-0000-c000-000000000000",
+          "d4ebce55-015a-49b5-a083-c84d1797ae8c",
+          "45a330b1-b1ec-4cc1-9161-9f03992aa49f"
+        )
+      }
+      Platforms =@{
+        IncludePlatforms =@(
+          "Linux"
+        )
+      }
+      users = @{
+        IncludeUsers = @(
+          "All"
+         )
+         ExcludeUsers =@(
+          $Z1
+         )
+         ExcludeGroups = @(
+          $ExcludeCAGroups.Id
+         )
+      }
+      Locations = @{
+        IncludeLocations = @(
+          "All"
+        )
+      }
+     }
+     GrantControls = @{
+       Operator = "OR"
+       BuiltInControls = @(
+         "compliantDevice"
+       )
+     }
+  }
+  New-MgIdentityConditionalAccessPolicy -BodyParameter $params | Out-Null
+            Write-Host "Created policy $PolicyName."
+        } else {
+            Write-Host "Skipped policy $PolicyName because it already exists."
+        }
+
+
+################### Require App Protection Policy IOS/Andriod ################
+$PolicyName = "CA011: Require Intune Mobile Device App Protection Policy"
+$Checkpolicy = Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$PolicyName'"
+$ExcludeCAGroups = Get-MgGroup -top 999 -Filter "startswith(DisplayName,'SG365_Exclude_CA011: Require Intune Mobile Device App Protection Polic')" | Select-Object ID
 if ($null -eq $Checkpolicy) {
   $params = @{
     DisplayName = $PolicyName
@@ -767,6 +1006,9 @@ if ($null -eq $Checkpolicy) {
          ExcludeUsers =@(
           $Z1
          )
+        ExcludeGroups = @(
+          $ExcludeCAGroups.Id
+         )
       }
       Locations = @{
         IncludeLocations = @(
@@ -791,6 +1033,7 @@ if ($null -eq $Checkpolicy) {
 ################### Block Unsupported Platforms ##############################
 $PolicyName = "CA010: Block access for unknown or unsupported device platform"
 $Checkpolicy = Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$PolicyName'"
+$ExcludeCAGroups = Get-MgGroup -top 999 -Filter "startswith(DisplayName,'SG365_Exclude_CA010: Block access for unknown or unsupported device platform')" | Select-Object ID
 if ($null -eq $Checkpolicy) {
   $params = @{
     DisplayName = $PolicyName
@@ -822,6 +1065,9 @@ if ($null -eq $Checkpolicy) {
          ExcludeUsers =@(
           $Z1
          )
+         ExcludeGroups = @(
+          $ExcludeCAGroups.Id
+         )
       }
       Locations = @{
         IncludeLocations = @(
@@ -842,10 +1088,10 @@ if ($null -eq $Checkpolicy) {
             Write-Host "Skipped policy $PolicyName because it already exists."
         }
 
-################### Block MFA Enrollment Off Prem Policy #######################
-$PolicyName = "CAJJ001: Block MFA Reistratoin off Prem"
+################### Block MFA Enrollment from Non Trusted Locations #######################
+$PolicyName = "CA012: Block MFA Enrollment from Non Trusted Locations"
 $Checkpolicy = Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$PolicyName'"
-$ExcludeCAGroups = Get-MgGroup -top 999 -Filter "startswith(DisplayName,'SG365_Exclude_CA00JJ01: Block MFA Enrollment off prem')" | Select-Object ID
+$ExcludeCAGroups = Get-MgGroup -top 999 -Filter "startswith(DisplayName,'SG365_Exclude_CA012: Block MFA Enrollment from Non Trusted Locations')" | Select-Object ID
 if ($null -eq $Checkpolicy) {
   $params = @{
     DisplayName = $PolicyName
@@ -890,8 +1136,9 @@ if ($null -eq $Checkpolicy) {
         }
 
 #################### Encrtytion Allow for External Users Policy ############
-$PolicyName = "CAJJ002: Email Encryption External User Access"
+$PolicyName = "CA013: Email Encryption External User Access"
 $Checkpolicy = Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$PolicyName'"
+ExcludeCAGroups = Get-MgGroup -top 999 -Filter "startswith(DisplayName,'SG365_Exclude_CA013: Email Encryption External User Access')" | Select-Object ID
 if ($null -eq $Checkpolicy) {
   $params = @{
     DisplayName = $PolicyName
@@ -911,6 +1158,9 @@ if ($null -eq $Checkpolicy) {
       users = @{
         IncludeUsers = @(
           "GuestsOrExternalUsers"
+         )
+         ExcludeGroups = @(
+          $ExcludeCAGroups.Id
          )
       }
       Locations = @{
@@ -937,7 +1187,7 @@ if ($null -eq $Checkpolicy) {
 
 
 #################### Default Block - Travel Policy ##############
-$PolicyName = "CAJJ003: Default Block - Travel Policy"
+$PolicyName = "CA0014: Default Block - Travel Policy"
 $Checkpolicy = Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$PolicyName'"
 $ExcludeCAGroups = Get-MgGroup -top 999 -Filter "startswith(DisplayName,'SG365_Exclude_CA002: Default Block - Travel Users Exclusion')" | Select-Object ID
 $TravelCountriesNamedLocation = Get-MgIdentityConditionalAccessNamedLocation -Filter "startswith(DisplayName,'Travel Countries')" | Select-Object ID
@@ -961,6 +1211,9 @@ if ($null -eq $Checkpolicy) {
          )
          ExcludeUsers =@(
           $Z1
+         )
+         ExcludeGroups = @(
+          $ExcludeCAGroups.Id
          )
       }
       Locations = @{
