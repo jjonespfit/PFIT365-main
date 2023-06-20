@@ -45,10 +45,10 @@ $StandardCAGroups= @(
     "SG365_Exclude_CA005: Require multi-factor authentication for guest access",
     "SG365_Exclude_CA006: Require multi-factor authentication for Azure management",
     "SG365_Exclude_CA009: Require compliant or hybrid Azure AD joined device for admins_Restricted",
-    "SG365_Exclude_CA009.5: Require Compliance Device - Windows Devices_Restricted",
-    "SG365_Exclude_CA009.6: Require Compliance Device - MacOS_Testing-Only",
-    "SG365_Exclude_CA009.7: Require Compliance Device - IOS-Android_Testing-Only",
-    "SG365_Exclude_CA009.8: Require Compliance Device - Linux_Testing-Only",
+    "SG365_Exclude_CA009.5: Require Compliant Device - Windows Devices_Restricted",
+    "SG365_Exclude_CA009.6: Require Compliant Device - MacOS_Testing-Only",
+    "SG365_Exclude_CA009.7: Require Compliant Device - IOS-Android_Testing-Only",
+    "SG365_Exclude_CA009.8: Require Compliant Device - Linux_Testing-Only",
     "SG365_Exclude_CA010: Block access for unknown or unsupported device platform",
     "SG365_Exclude_CA011: Require Intune Mobile Device App Protection Policy",
     "SG365_Exclude_CA012: Block MFA Enrollment from Non Trusted Locations",
@@ -586,7 +586,7 @@ if ($null -eq $Checkpolicy) {
 ################### Require Compliant Device Windows ###########
 $PolicyName = "CA009.5: Require Compliant Device - Windows Devices"
 $Checkpolicy = Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$PolicyName'"
-$ExcludeCAGroups = Get-MgGroup -top 999 -Filter "startswith(DisplayName,'SG365_Exclude_CA009.5: Require Compliance Device - Windows Devices_Restricted')" | Select-Object ID
+$ExcludeCAGroups = Get-MgGroup -top 999 -Filter "startswith(DisplayName,'SG365_Exclude_CA009.5: Require Compliant Device - Windows Devices_Restricted')" | Select-Object ID
 if ($null -eq $Checkpolicy) {
   $params = @{
     DisplayName = $PolicyName
@@ -804,7 +804,7 @@ if ($null -eq $Checkpolicy) {
 ################### Require Compliant Device Policy IOS/ Andriod #############
 $PolicyName = "CA009.7: Require Compliant Device IOS-Android"
 $Checkpolicy = Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$PolicyName'"
-$ExcludeCAGroups = Get-MgGroup -top 999 -Filter "startswith(DisplayName,'SG365_Exclude_CA009.7: Require Compliance Device - IOS-Android_Testing-Only')" | Select-Object ID
+$ExcludeCAGroups = Get-MgGroup -top 999 -Filter "startswith(DisplayName,'SG365_Exclude_CA009.7: Require Compliant Device - IOS-Android_Testing-Only')" | Select-Object ID
 if ($null -eq $Checkpolicy) {
   $params = @{
     DisplayName = $PolicyName
@@ -916,7 +916,7 @@ if ($null -eq $Checkpolicy) {
 ################### Require Compliant Device Linuc  ###########
 $PolicyName = "CA009.8: Require Compliant Device - Linux"
 $Checkpolicy = Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$PolicyName'"
-$ExcludeCAGroups = Get-MgGroup -top 999 -Filter "startswith(DisplayName,'SG365_Exclude_CA009.8: Require Compliance Device - Linux_Testing-Only')" | Select-Object ID
+$ExcludeCAGroups = Get-MgGroup -top 999 -Filter "startswith(DisplayName,'SG365_Exclude_CA009.8: Require Compliant Device - Linux_Testing-Only')" | Select-Object ID
 if ($null -eq $Checkpolicy) {
   $params = @{
     DisplayName = $PolicyName
@@ -1135,10 +1135,10 @@ if ($null -eq $Checkpolicy) {
             Write-Host "Skipped policy $PolicyName because it already exists."
         }
 
-#################### Encrtytion Allow for External Users Policy ############
+#################### Encryptino Allow for External Users Policy ############
 $PolicyName = "CA013: Email Encryption External User Access"
 $Checkpolicy = Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$PolicyName'"
-ExcludeCAGroups = Get-MgGroup -top 999 -Filter "startswith(DisplayName,'SG365_Exclude_CA013: Email Encryption External User Access')" | Select-Object ID
+$ExcludeCAGroups = Get-MgGroup -top 999 -Filter "startswith(DisplayName,'SG365_Exclude_CA013: Email Encryption External User Access')" | Select-Object ID
 if ($null -eq $Checkpolicy) {
   $params = @{
     DisplayName = $PolicyName
