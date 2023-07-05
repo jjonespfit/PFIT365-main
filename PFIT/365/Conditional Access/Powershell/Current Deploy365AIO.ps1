@@ -88,7 +88,7 @@ $BreakGlassAccounts =@(
 
 ForEach ($user in $BreakGlassAccounts){
  # check if User exists
- $UserCheck = get-mguser | Where-Object -Property UserPrincipalName -CMatch zEmergencyAdmin
+ $UserCheck = get-mguser | Where-Object -Property UserPrincipalName -CMatch $User
  #$UserCheck = get-mgUser -Property Displayname | Where-Object DisplayName eq $($User)
  #if not exists then create it
  if ($null -eq $UserCheck){
@@ -181,6 +181,9 @@ if ($null -eq $Checkpolicy) {
         )
       }
       users = @{
+        ExcludeUsers =@(
+          $Z1
+         )
         IncludeRoles = @(
           "62e90394-69f5-4237-9190-012177145e10",
           "194ae4cb-b126-40b2-bd5b-6091b380977d",
@@ -534,6 +537,9 @@ if ($null -eq $Checkpolicy) {
         )
       }
       users = @{
+        ExcludeUsers =@(
+          $Z1
+         )
         IncludeRoles =@(
           "62e90394-69f5-4237-9190-012177145e10",
           "194ae4cb-b126-40b2-bd5b-6091b380977d",
@@ -1187,7 +1193,7 @@ if ($null -eq $Checkpolicy) {
 
 
 #################### Default Block - Travel Policy ##############
-$PolicyName = "CA0014: Default Block - Travel Policy"
+$PolicyName = "CA014: Default Block - Travel Policy"
 $Checkpolicy = Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$PolicyName'"
 $ExcludeCAGroups = Get-MgGroup -top 999 -Filter "startswith(DisplayName,'SG365_Exclude_CA002: Default Block - Travel Users Exclusion')" | Select-Object ID
 $TravelCountriesNamedLocation = Get-MgIdentityConditionalAccessNamedLocation -Filter "startswith(DisplayName,'Travel Countries')" | Select-Object ID

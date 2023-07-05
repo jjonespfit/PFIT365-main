@@ -1,0 +1,84 @@
+$params = @{
+	conditions = @{
+		applications = @{
+			includeApplications = @(
+				"All"
+			)
+			excludeApplications = @(
+			)
+			includeUserActions = @(
+			)
+			includeAuthenticationContextClassReferences = @(
+			)
+			networkAccess = $null
+		}
+		clients = $null
+		users = @{
+			includeUsers = @(
+				"All"
+			)
+			excludeUsers = @(
+			)
+			includeGroups = @(
+			)
+			excludeGroups = @(
+			)
+			includeRoles = @(
+			)
+			excludeRoles = @(
+			)
+			includeGuestsOrExternalUsers = $null
+			excludeGuestsOrExternalUsers = $null
+		}
+		clientApplications = $null
+		platforms = $null
+		locations = $null
+		userRiskLevels = @(
+			"high"
+			"medium"
+		)
+		signInRiskLevels = @(
+		)
+		signInRiskDetections = $null
+		clientAppTypes = @(
+			"all"
+		)
+		times = $null
+		devices = $null
+		servicePrincipalRiskLevels = @(
+		)
+	}
+	displayName = "User Risk Policy - MFA and SSPR"
+	grantControls = @{
+		operator = "AND"
+		builtInControls = @(
+			"passwordChange"
+		)
+		customAuthenticationFactors = @(
+		)
+		termsOfUse = @(
+		)
+		authenticationStrength = @{
+			id = "00000000-0000-0000-0000-000000000002"
+		}
+	}
+	sessionControls = @{
+		applicationEnforcedRestrictions = $null
+		cloudAppSecurity = $null
+		signInFrequency = @{
+			type = $null
+			value = $null
+			authenticationType = "primaryAndSecondaryAuthentication"
+			frequencyInterval = "everyTime"
+			isEnabled = $true
+		}
+		persistentBrowser = $null
+		continuousAccessEvaluation = $null
+		disableResilienceDefaults = $null
+		secureSignInSession = $null
+		networkAccessSecurity = $null
+	}
+	state = "disabled"
+}
+
+Update-MgIdentityConditionalAccessPolicy -ConditionalAccessPolicyId $conditionalAccessPolicyId -BodyParameter $params

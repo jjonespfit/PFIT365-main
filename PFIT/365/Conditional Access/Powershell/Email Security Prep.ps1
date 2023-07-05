@@ -23,7 +23,7 @@ Set-IRMConfiguration -LicensingLocation @{add=$licenseUrl} -InternalLicensingEna
     Set-HostedContentFilterPolicy -Identity "Default" -IncreaseScoreWithImageLinks On -IncreaseScoreWithNumericIps On -IncreaseScoreWithRedirectToOtherPort On -IncreaseScoreWithBizOrInfoUrls On -MarkAsSpamEmptyMessages On -MarkAsSpamSensitiveWordList On -MarkAsSpamSpfRecordHardFail On -MarkAsSpamFromAddressAuthFail On -MarkAsSpamBulkMail On -MarkAsSpamNdrBackscatter On -HighConfidenceSpamAction Quarantine -SpamAction MoveToJmf -DownloadLink $false -BulkThreshold 5 -InlineSafetyTips $true -BulkSpamAction Quarantine -PhishSpamAction MoveToJmf -SpamZapEnabled $true -PhishZapEnabled $true -HighConfidencePhishAction Quarantine -EnableRegionBlockList $true -EnableLanguageBlockList $true -RegionBlockList $RBL -LanguageBlockList $LBL
     
     ## Set Malware Filter Policy to standards
-    Set-MalwareFilterPolicy -Identity "Default" -InternalSenderAdminAddress jordan.jones@pathforwardit.com -EnableInternalSenderAdminNotifications $true -EnableFileFilter $true -ZapEnabled $true
+    Set-MalwareFilterPolicy -Identity "Default" -InternalSenderAdminAddress zsecalerts@pathforward.us -EnableInternalSenderAdminNotifications $true -EnableFileFilter $true -ZapEnabled $true
     
     ## Set Hosted Outbound Spam Filter Policy to standards
     Set-HostedOutboundSpamFilterPolicy -Identity "Default" -AutoForwardingMode On
@@ -110,3 +110,6 @@ Disconnect-ExchangeOnline
 PII Enhanced for Teams 
 
 Discuss Prompt in Teams as needed
+
+
+
