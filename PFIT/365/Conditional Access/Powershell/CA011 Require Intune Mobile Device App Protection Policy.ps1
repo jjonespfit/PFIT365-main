@@ -1,29 +1,28 @@
-################### Block Unsupported Platforms ##############################
-$PolicyName = "CA010: Block access for unknown or unsupported device platform"
+################### Require App Protection Policy IOS/Andriod ################
+$PolicyName = "CA011: Require Intune Mobile Device App Protection Policy"
 $Checkpolicy = Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$PolicyName'"
-$ExcludeCAGroups = Get-MgGroup -top 999 -Filter "startswith(DisplayName,'SG365_Exclude_CA010: Block access for unknown or unsupported device platform')" | Select-Object ID
+$ExcludeCAGroups = Get-MgGroup -top 999 -Filter "startswith(DisplayName,'SG365_Exclude_CA011: Require Intune Mobile Device App Protection Polic')" | Select-Object ID
 if ($null -eq $Checkpolicy) {
   $params = @{
     DisplayName = $PolicyName
     State = "disabled"
     Conditions = @{
       ClientAppTypes = @(
-        "All"
+        "browser", 
+          "mobileAppsAndDesktopClients"
       )
       Applications = @{
         IncludeApplications = @(
           "All"
         )
+        ExcludeApplications =@(
+          "d4ebce55-015a-49b5-a083-c84d1797ae8c"
+        )
       }
       Platforms =@{
         IncludePlatforms =@(
-          "All"
-        )
-        ExcludePlatforms =@(
           "android",
-          "iOS",
-          "windows",
-          "macOS"
+          "iOS"
         )
       }
       users = @{
@@ -33,7 +32,7 @@ if ($null -eq $Checkpolicy) {
          ExcludeUsers =@(
           $Z1
          )
-         ExcludeGroups = @(
+        ExcludeGroups = @(
           $ExcludeCAGroups.Id
          )
       }
@@ -44,9 +43,10 @@ if ($null -eq $Checkpolicy) {
       }
      }
      GrantControls = @{
-       Operator = "OR"
+       Operator = "AND"
        BuiltInControls = @(
-        "Block"
+        "approvedApplication", 
+        "compliantApplication"
        )
      }
   }

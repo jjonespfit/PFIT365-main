@@ -1,7 +1,7 @@
-################### Block Unsupported Platforms ##############################
-$PolicyName = "CA010: Block access for unknown or unsupported device platform"
+#################### Encryptino Allow for External Users Policy ############
+$PolicyName = "CA013: Email Encryption External User Access"
 $Checkpolicy = Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$PolicyName'"
-$ExcludeCAGroups = Get-MgGroup -top 999 -Filter "startswith(DisplayName,'SG365_Exclude_CA010: Block access for unknown or unsupported device platform')" | Select-Object ID
+$ExcludeCAGroups = Get-MgGroup -top 999 -Filter "startswith(DisplayName,'SG365_Exclude_CA013: Email Encryption External User Access')" | Select-Object ID
 if ($null -eq $Checkpolicy) {
   $params = @{
     DisplayName = $PolicyName
@@ -14,24 +14,13 @@ if ($null -eq $Checkpolicy) {
         IncludeApplications = @(
           "All"
         )
-      }
-      Platforms =@{
-        IncludePlatforms =@(
-          "All"
-        )
-        ExcludePlatforms =@(
-          "android",
-          "iOS",
-          "windows",
-          "macOS"
+        ExcludeApplications = @(
+          "00000012-0000-0000-c000-000000000000"
         )
       }
       users = @{
         IncludeUsers = @(
-          "All"
-         )
-         ExcludeUsers =@(
-          $Z1
+          "GuestsOrExternalUsers"
          )
          ExcludeGroups = @(
           $ExcludeCAGroups.Id
@@ -40,6 +29,9 @@ if ($null -eq $Checkpolicy) {
       Locations = @{
         IncludeLocations = @(
           "All"
+        )
+        ExcludeLocations =@(
+          "AllTrusted"
         )
       }
      }
