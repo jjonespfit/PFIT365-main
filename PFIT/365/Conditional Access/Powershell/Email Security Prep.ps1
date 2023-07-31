@@ -7,9 +7,11 @@ Import-Module ExchangeOnline
 Connect-ExchangeOnline
 Enable-OrganizationCustomization
 $licenseUrl = (Get-AadrmConfiguration).LicensingIntranetDistributionPointUrl
-    
+
 Set-IRMConfiguration -LicensingLocation @{add=$licenseUrl} -InternalLicensingEnabled $true -AutomaticServiceUpdateEnabled $true -EnablePdfEncryption $true -SimplifiedClientAccessEnabled $true -DecryptAttachmentForEncryptOnly $true -AzureRMSLicensingEnabled $true
-    
+
+$licenseUrl = https://27043924-7ae0-4b08-a596-286d210ea668.rms.na.aadrm.com/_wmcs/licensing
+Set-IRMConfiguration -LicensingLocation @{add=$licenseUrl} -InternalLicensingEnabled $true -AutomaticServiceUpdateEnabled $true -EnablePdfEncryption $true -SimplifiedClientAccessEnabled $true -DecryptAttachmentForEncryptOnly $true -AzureRMSLicensingEnabled $true
 
 
         $LBL = "RU","ZH-CN","ZH-TW","JA","KO","HE","LV","AR","FR","Vi","PT"
@@ -32,10 +34,10 @@ Set-IRMConfiguration -LicensingLocation @{add=$licenseUrl} -InternalLicensingEna
     Set-HostedConnectionFilterPolicy -Identity "Default" -EnableSafeList $true
     
     ## Set Safe Attachment Policy to standards
-    New-SafeAttachmentPolicy -Name "Default SA Policy" -Redirect $false -Action DynamicDelivery -Enable $true -ActionOnError $false 
+    New-SafeAttachmentPolicy -Name "Default SA Policy" -Redirect $false -Action DynamicDelivery -Enable $true 
     
     ##Set Safe Attachments Rule
-    New-SafeAttachmentRule -Name "Default SA Rule" -SafeAttachmentPolicy "Default SA Policy" -RecipientDomainIs $domains.domainname
+    New-SafeAttachmentRule -Name "Default SA Rule" -SafeAttachmentPolicy "Default SA Policy" -RecipientDomainIs $domains.domainname 
     
     ##SafeLinks Policy
     New-SafeLinksPolicy -Name "Default SL Policy" -EnableSafeLinksforEmail $true -EnableSafeLinksForTeams $true -ScanUrls $true -EnableOrganizationBranding $true -DeliverMessageAfterScan $true -EnableForInternalSenders $true -AllowClickThrough $false -TrackClicks $true
@@ -46,7 +48,7 @@ Set-IRMConfiguration -LicensingLocation @{add=$licenseUrl} -InternalLicensingEna
     ##Anti-Phish Policy
     Set-AntiPhishPolicy -Identity "Office365 AntiPhish Default" -PhishThresholdLevel 3 -EnableMailboxIntelligenceProtection $true -EnableOrganizationDomainsProtection $true -EnableMailboxIntelligence $true -EnableSimilarDomainsSafetyTips $true -EnableFirstContactSafetyTips $true -EnableUnusualCharactersSafetyTips $true -EnableSpoofIntelligence $true -EnableViaTag $true -EnableUnauthenticatedSender $true -MailboxIntelligenceProtectionAction MovetoJmf -TargetedDomainProtectionAction MovetoJmf -AuthenticationFailAction MovetoJmf
     
-Connect-IPPSSession
+#Connect-IPPSSession
 
     $CCSI = @(@{Name="International Classification of Diseases (ICD-9-CM)"; maxcount="-1"; confidencelevel="High"; mincount="1"},@{Name="International Classification of Diseases (ICD-10-CM)"; maxcount="-1"; confidencelevel="High"; mincount="1"},@{Name="All Medical Terms And Conditions"; maxcount="-1"; confidencelevel="High"; mincount="1"},@{Name="U.S. Physical Addresses"; maxcount="-1"; confidencelevel="Medium"; mincount="1"})
     $params = @{
